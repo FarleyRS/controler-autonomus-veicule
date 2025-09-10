@@ -1,75 +1,73 @@
-import RPi.GPIO as GPIO          
-from time import sleep
+import RPi.GPIO as GPIO
 import time
 
 class Motor:
     def __init__(self, in1, in2):
         self.in1 = in1
         self.in2 = in2
+        GPIO.setup(self.in1, GPIO.OUT)
+        GPIO.setup(self.in2, GPIO.OUT)
 
-motor1 = Motor(24, 23)
-motor1.in1 = 24
-motor1.in2 = 23
+    def frente(self):
+        GPIO.output(self.in1, GPIO.HIGH)
+        GPIO.output(self.in2, GPIO.LOW)
 
-motor2 = Motor(27, 22)
-motor2.in1 = 27
-motor2.in2 = 22
+    def tras(self):
+        GPIO.output(self.in1, GPIO.LOW)
+        GPIO.output(self.in2, GPIO.HIGH)
 
+    def parar(self):
+        GPIO.output(self.in1, GPIO.LOW)
+        GPIO.output(self.in2, GPIO.LOW)
+
+
+# Configura o modo de numeração dos pinos
 GPIO.setmode(GPIO.BCM)
 
-# moto 1
-GPIO.setup(in1, GPIO.OUT)  # IN1
-GPIO.setup(in2, GPIO.OUT)  # IN2
+# Define motores
+motor1 = Motor(24, 23)  # motor esquerdo
+motor2 = Motor(27, 22)  # motor direito
 
-# moto 2
-GPIO.setup(in3, GPIO.OUT)  # IN3
-GPIO.setup(in4, GPIO.OUT)  # IN4
-
-
-# FunÃ§Ã£o para girar o motor para frente
 def frente():
-    GPIO.output(in1, GPIO.HIGH)
-    GPIO.output(in2, GPIO.LOW)
-    GPIO.output(in3, GPIO.HIGH)
-    GPIO.output(in4, GPIO.LOW)
-    
+    motor1.frente()
+    motor2.frente()
 
-# FunÃ§Ã£o para girar o motor para trÃ¡s
 def tras():
-    GPIO.output(in1, GPIO.LOW)
-    GPIO.output(in2, GPIO.HIGH)
-    GPIO.output(in3, GPIO.LOW)
-    GPIO.output(in4, GPIO.HIGH)
+    motor1.tras()
+    motor2.tras()
 
-# FunÃ§Ã£o para parar o motor
 def parar():
-    GPIO.output(in1, GPIO.LOW)
-    GPIO.output(in2, GPIO.LOW)
-    GPIO.output(in3, GPIO.LOW)
-    GPIO.output(in4, GPIO.LOW)
+    motor1.parar()
+    motor2.parar()
 
-while(1):
 
-    comando = input("Digite 'f' para frente ou 't' para tras: ")
-    
-    if comando == 'f':
-        frente()
-        print("Movendo para frente...")
-        
-    elif comando == 't':
-        tras()
-        print("Movendo para tras...")
-        
-    elif comando == 'p':
-        parar()
-        print("parado!!!")
-        
-    elif comando == 'q':
-        parar()
-        print("SAINDO")
-        exit()
-        
-    else:
-        print("Comando invalido.")
-        
-    time.sleep(2)
+try:
+    while True:
+        comando = input("Digite 'f' para frente, 't' para tras, 'p' para parar ou 'q' para sair: ")
+
+        if comando == 'f':
+            frente()
+            print("Movendo para frente...")
+
+        elif comando == 't':
+            tras()
+            print("Movendo para tras...")
+
+        elif comando == 'p':
+            parar()
+            print("Parado!!!")
+
+        elif comando == 'q':
+            parar()
+            print("SAINDO...")
+            break
+
+        else:
+            print("Comando invalido.")
+
+        time.sleep(2)
+
+finally:
+    parar()
+    GPIO.cleanup()
+    print("GPIO liberado com sucesso.")
